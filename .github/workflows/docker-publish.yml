@@ -29,7 +29,7 @@ jobs:
           file: ./Dockerfile  # Asegúrate de que esta ruta sea correcta
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.ref_name }}
+            ilyas495867/custom_nginx:${{ github.ref_name }}
 
       - name: Log out from Docker Hub
         run: docker logout
