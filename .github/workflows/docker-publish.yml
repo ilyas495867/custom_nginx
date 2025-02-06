@@ -1,35 +1,28 @@
-name: Publish Docker image to Docker Hub
+name: Build and Publish Docker Image
 
 on:
   push:
     tags:
-      - 'v*'  # Se ejecuta solo cuando se crea un tag que comienza con 'v'
+      - 'v*'  # Este trigger se activará cuando se cree un tag con el formato v*
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/my_nginx:${GITHUB_REF##*/} .
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile  # Asegúrate de que esta ruta sea correcta
-          push: true
-          tags: |
-            ilyas495867/custom_nginx:${{ github.ref_name }}
-
-      - name: Log out from Docker Hub
-        run: docker logout
+    - name: Push Docker image
+      run: |
+        docker push ${{ secrets.DOCKER_USERNAME }}/my_nginx:${GITHUB_REF##*/}
